@@ -217,7 +217,7 @@ if(!empty($texto) and empty($array_conversa['menu'])){
     $apostas = requisitar_apostas();
     $i = 1;
     foreach($apostas as $aposta){
-        if($aposta['tipsterAtivo'] == 'jose alberto'){
+        if($aposta['tipsterAtivo'] == 'Bloco D'){
         $mensagem = $mensagem.urlencode("*".$i.".* ".$aposta['evento']." - ".$aposta['aposta']."\n");
         $i++;
         }
