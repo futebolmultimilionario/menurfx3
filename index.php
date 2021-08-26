@@ -119,7 +119,7 @@ return $response['Data'];
 
 function muda_usuario($usuario, $status){
     $curl = curl_init();
-    $array_usuarios = array("contarfxinvesting10@gmail.com" => array("01",
+    $array_usuarios = array("contarfxinvesting10@gmail.com" => array("01 - 18/08/2021",
                                                                     "mfcamp",
                                                                     "",
                                                                     ""),
@@ -127,7 +127,7 @@ function muda_usuario($usuario, $status){
                                                                     "gerlucio4",
                                                                     "",
                                                                     ""),
-                            "contarfxinvesting16@gmail.com" => array("03",
+                            "contarfxinvesting16@gmail.com" => array("03 - 18/08/2021",
                                                                     "ironsword1",
                                                                     "",
                                                                     ""),
@@ -135,12 +135,16 @@ function muda_usuario($usuario, $status){
                                                                     "kennedylucas3",
                                                                     "",
                                                                     ""),
-                            "conrfxinvesting201@gmail.com" => array("05",
+                            "conrfxinvesting201@gmail.com" => array("05 - 18/08/2021",
                                                                     "tujamo365",
                                                                     "",
                                                                     ""),
-                            "contarfxinvesting29@gmail.com" => array("06",
+                            "contarfxinvesting29@gmail.com" => array("06 - 18/08/2021",
                                                                     "donaozete",
+                                                                    "",
+                                                                    ""),
+                            "conrfxinvesting192@gmail.com" => array("07 - 26/08/2021",
+                                                                    "iolandagba",
                                                                     "",
                                                                     ""));
     curl_setopt_array($curl, array(
