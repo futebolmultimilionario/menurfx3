@@ -166,7 +166,7 @@ function requisitar_apostas(){
     $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://automatips.com.br/api/Bot/getBets?token=4vP1qyA6QAb12tW34kSgVp01fjYm4cs8POlt5M75n13VmcXBcLcX3r50hySq5D&pendentes=sim&tokenAplicacao=JOS2F00AF043DBB75A3B12F28A5D4A1391A48EE9DD3DF424F840C63BCD3345CE02A&_=1630162602502',
+  CURLOPT_URL => 'https://automatips.com.br/api/Bot/getBets?token=soMe6uEUlLUIi6aslS1v7ons5EHGbnTkUQDMl9inUveRfXSpIEgdsQqeKGvdF3a&pendentes=sim&tokenAplicacao=JOS2F00AF043DBB75A3B12F28A5D4A1391A48EE9DD3DF424F840C63BCD3345CE02A&_=1630162602502',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -187,7 +187,7 @@ curl_setopt_array($curl, array(
     'sec-fetch-dest: empty',
     'referer: https://automatips.com.br/v2/dashboardAdm.html',
     'accept-language: pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
-    'cookie: token="4vP1qyA6QAb12tW34kSgVp01fjYm4cs8POlt5M75n13VmcXBcLcX3r50hySq5D"; tokenAplicacao=JOS2F00AF043DBB75A3B12F28A5D4A1391A48EE9DD3DF424F840C63BCD3345CE02A; Servidor=http://automatips.com.br:7009; emailLogin=josealberto.gomes@hotmail.com; dtVen=2021-08-29T02:40:16Z'
+    'cookie: token="soMe6uEUlLUIi6aslS1v7ons5EHGbnTkUQDMl9inUveRfXSpIEgdsQqeKGvdF3a"; tokenAplicacao=JOS2F00AF043DBB75A3B12F28A5D4A1391A48EE9DD3DF424F840C63BCD3345CE02A; Servidor=http://automatips.com.br:7009; emailLogin=josealberto.gomes@hotmail.com; dtVen=2021-08-29T02:40:16Z'
   ),
 ));
 
@@ -203,7 +203,7 @@ function verifica_usuarios($id){
     $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://automatips.com.br/api/Bot/getBetsUser?token=4vP1qyA6QAb12tW34kSgVp01fjYm4cs8POlt5M75n13VmcXBcLcX3r50hySq5D&matchid='.$id.'&tokenAplicacao=JOS2F00AF043DBB75A3B12F28A5D4A1391A48EE9DD3DF424F840C63BCD3345CE02A&_=1630162602507',
+  CURLOPT_URL => 'https://automatips.com.br/api/Bot/getBetsUser?token=soMe6uEUlLUIi6aslS1v7ons5EHGbnTkUQDMl9inUveRfXSpIEgdsQqeKGvdF3a&matchid='.$id.'&tokenAplicacao=JOS2F00AF043DBB75A3B12F28A5D4A1391A48EE9DD3DF424F840C63BCD3345CE02A&_=1630162602507',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -224,7 +224,7 @@ curl_setopt_array($curl, array(
     'sec-fetch-dest: empty',
     'referer: https://automatips.com.br/v2/dashboardAdm.html',
     'accept-language: pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
-    'cookie: token="4vP1qyA6QAb12tW34kSgVp01fjYm4cs8POlt5M75n13VmcXBcLcX3r50hySq5D"; tokenAplicacao=JOS2F00AF043DBB75A3B12F28A5D4A1391A48EE9DD3DF424F840C63BCD3345CE02A; Servidor=http://automatips.com.br:7009; emailLogin=josealberto.gomes@hotmail.com; dtVen=2021-08-29T02:40:16Z'
+    'cookie: token="soMe6uEUlLUIi6aslS1v7ons5EHGbnTkUQDMl9inUveRfXSpIEgdsQqeKGvdF3a"; tokenAplicacao=JOS2F00AF043DBB75A3B12F28A5D4A1391A48EE9DD3DF424F840C63BCD3345CE02A; Servidor=http://automatips.com.br:7009; emailLogin=josealberto.gomes@hotmail.com; dtVen=2021-08-29T02:40:16Z'
   ),
 ));
 
@@ -240,7 +240,7 @@ function verifica_status(){
     $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://automatips.com.br/api/Adm/getUsuarios?token=4vP1qyA6QAb12tW34kSgVp01fjYm4cs8POlt5M75n13VmcXBcLcX3r50hySq5D&tokenAplicacao=JOS2F00AF043DBB75A3B12F28A5D4A1391A48EE9DD3DF424F840C63BCD3345CE02A',
+  CURLOPT_URL => 'https://automatips.com.br/api/Adm/getUsuarios?token=soMe6uEUlLUIi6aslS1v7ons5EHGbnTkUQDMl9inUveRfXSpIEgdsQqeKGvdF3a&tokenAplicacao=JOS2F00AF043DBB75A3B12F28A5D4A1391A48EE9DD3DF424F840C63BCD3345CE02A',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -261,7 +261,7 @@ curl_setopt_array($curl, array(
     'sec-fetch-dest: empty',
     'referer: https://automatips.com.br/v2/dashboardAdm.html',
     'accept-language: pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
-    'cookie: token="4vP1qyA6QAb12tW34kSgVp01fjYm4cs8POlt5M75n13VmcXBcLcX3r50hySq5D"; tokenAplicacao=JOS2F00AF043DBB75A3B12F28A5D4A1391A48EE9DD3DF424F840C63BCD3345CE02A; Servidor=http://automatips.com.br:7009; emailLogin=josealberto.gomes@hotmail.com; dtVen=2021-08-29T02:40:16Z'
+    'cookie: token="soMe6uEUlLUIi6aslS1v7ons5EHGbnTkUQDMl9inUveRfXSpIEgdsQqeKGvdF3a"; tokenAplicacao=JOS2F00AF043DBB75A3B12F28A5D4A1391A48EE9DD3DF424F840C63BCD3345CE02A; Servidor=http://automatips.com.br:7009; emailLogin=josealberto.gomes@hotmail.com; dtVen=2021-08-29T02:40:16Z'
   ),
 ));
 
@@ -351,7 +351,7 @@ function muda_usuario($usuario, $status){
     'sec-fetch-dest: empty',
     'referer: https://automatips.com.br/v2/dashboardAdm.html',
     'accept-language: pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
-    'cookie: token="4vP1qyA6QAb12tW34kSgVp01fjYm4cs8POlt5M75n13VmcXBcLcX3r50hySq5D"; tokenAplicacao=JOS2F00AF043DBB75A3B12F28A5D4A1391A48EE9DD3DF424F840C63BCD3345CE02A; Servidor=http://automatips.com.br:7009; emailLogin=josealberto.gomes@hotmail.com; dtVen=2021-08-29T02:40:16Z'
+    'cookie: token="soMe6uEUlLUIi6aslS1v7ons5EHGbnTkUQDMl9inUveRfXSpIEgdsQqeKGvdF3a"; tokenAplicacao=JOS2F00AF043DBB75A3B12F28A5D4A1391A48EE9DD3DF424F840C63BCD3345CE02A; Servidor=http://automatips.com.br:7009; emailLogin=josealberto.gomes@hotmail.com; dtVen=2021-08-29T02:40:16Z'
   ),
 ));
 
