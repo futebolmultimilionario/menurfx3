@@ -58,8 +58,7 @@ function pega_partidas_db($num_partidas){
     $db_handle = pg_connect("host=ec2-54-147-93-73.compute-1.amazonaws.com dbname=d8q4dlsoafqi5t port=5432 user=cqcnyvrfyyhzoo password=c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625");
     $query = "SELECT * FROM aposta LIMIT '$num_partidas'";
     $rs = pg_query($db_handle, $query);
-    while ($row = pg_fetch_row($rs)){
-    }
+    $row = pg_fetch_all($rs);
     return $row;
 }
 
