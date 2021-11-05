@@ -507,7 +507,7 @@ function verifica_apostas_concluidas($array_aposta){
         $controle_duplicadas = 0;
         $controle_naofeitas = 0;
         foreach($aposta as $aposta_duplicada){
-            $usuarios = requisita_usuario($aposta_duplicada['id']);
+            $usuarios = verifica_usuarios($aposta_duplicada['id']);
             foreach($usuarios as $usuario){
                 if($usuario['resultado'] == 0){
                     $array_usuarios[$usuario['emailUsuario']][2]++;
