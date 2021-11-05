@@ -432,8 +432,7 @@ function seleciona_numeropartida(){
 }
 
 function verifica_apostas_concluidas($array_aposta){
-    global $APIurl;
-    global $token;
+
     $array_aposta_cadastrada = array();
     $i = 0;
     foreach($array_aposta as $aposta){
@@ -445,7 +444,7 @@ function verifica_apostas_concluidas($array_aposta){
         }
         $i++;
     }
-    
+    $mensagem = "";
     foreach($array_aposta_cadastrada as $key => $aposta){
         $array_usuarios = array("contarfxinvesting04@gmail.com" => array("04",
                                                                     "elenir19904",
@@ -514,7 +513,7 @@ function verifica_apostas_concluidas($array_aposta){
                 }  
             }
         }
-        $mensagem = "*".$key."*<br>";
+        
         $mensagem_duplicadas = "🔄 Contas duplicadas:<br>";
         $mensagem_naofeitas = "⛔ Contas que não fizeram:<br>";
         foreach($array_usuarios as $usuario){
@@ -528,15 +527,17 @@ function verifica_apostas_concluidas($array_aposta){
                 }
             }
         }
-        if($controle_naofeitas == 1){
-            $mensagem = "<br>".$mensagem.$mensagem_naofeitas;
-        }if($controle_duplicadas == 1){
-            $mensagem = "<br>".$mensagem.$mensagem_duplicadas;
-        }
+        
         if($controle_naofeitas == 1 or $controle_duplicadas == 1){
-            file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1629250128@g.us&body=".$mensagem);
+            $mensagem = $mensagem."*".$key."*<br>";
+            if($controle_naofeitas == 1){
+                $mensagem = "<br>".$mensagem.$mensagem_naofeitas;
+            }if($controle_duplicadas == 1){
+                $mensagem = "<br>".$mensagem.$mensagem_duplicadas;
+            }
         }
     }
+    return $mensagem;
 }
 
 function envia_dados($data){
@@ -638,8 +639,8 @@ if(!empty($texto) and empty($array_conversa['menu'])){
     $atualiza_menu = pg_query($db_handle, $update_menu);
 }else if(is_numeric($texto) and $array_conversa['menu'] == 3 and ($array_conversa['hora'] + 1800) >= time()){
 
-    verifica_apostas_concluidas(pega_partidas_db($texto));
-
+    $mensagem = urlencode(verifica_apostas_concluidas(pega_partidas_db($texto)));
+    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1629250128@g.us&body=".$mensagem);
 
     $db_handle = pg_connect("host=ec2-54-147-93-73.compute-1.amazonaws.com dbname=d8q4dlsoafqi5t port=5432 user=cqcnyvrfyyhzoo password=c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625");
     $deletar_query = "TRUNCATE TABLE aposta";
