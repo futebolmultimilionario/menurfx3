@@ -514,26 +514,26 @@ function verifica_apostas_concluidas($array_aposta){
             }
         }
         
-        $mensagem_duplicadas = "🔄 Contas duplicadas:<br>";
-        $mensagem_naofeitas = "⛔ Contas que não fizeram:<br>";
+        $mensagem_duplicadas = "🔄 Contas duplicadas:\n";
+        $mensagem_naofeitas = "⛔ Contas que não fizeram:\n";
         foreach($array_usuarios as $usuario){
             if($usuario[2] != 1){
                 if($usuario[2] == 0){
                     $controle_naofeitas = 1;
-                    $mensagem_naofeitas = $mensagem_naofeitas.$usuario[0]." - ".$usuario[1]."<br>";
+                    $mensagem_naofeitas = $mensagem_naofeitas.$usuario[0]." - ".$usuario[1]."\n";
                 }if($usuario[2] > 1){
                     $controle_duplicadas = 1;
-                    $mensagem_duplicadas = $mensagem_duplicadas.$usuario[0]." - ".$usuario[1]."(".$usuario[2]."x)<br>";
+                    $mensagem_duplicadas = $mensagem_duplicadas.$usuario[0]." - ".$usuario[1]."(".$usuario[2]."x)\n";
                 }
             }
         }
         
         if($controle_naofeitas == 1 or $controle_duplicadas == 1){
-            $mensagem = $mensagem."*".$key."*<br>";
+            $mensagem = $mensagem."*".$key."*\n";
             if($controle_naofeitas == 1){
-                $mensagem = "<br>".$mensagem.$mensagem_naofeitas;
+                $mensagem = "\n".$mensagem.$mensagem_naofeitas;
             }if($controle_duplicadas == 1){
-                $mensagem = "<br>".$mensagem.$mensagem_duplicadas;
+                $mensagem = "\n".$mensagem.$mensagem_duplicadas;
             }
         }
     }
