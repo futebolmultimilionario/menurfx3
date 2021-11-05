@@ -523,7 +523,7 @@ function verifica_apostas_concluidas($array_aposta){
                     $mensagem_naofeitas = $mensagem_naofeitas.$usuario[0]." - ".$usuario[1]."\n";
                 }if($usuario[2] > 1){
                     $controle_duplicadas = 1;
-                    $mensagem_duplicadas = $mensagem_duplicadas.$usuario[0]." - ".$usuario[1]."(".$usuario[2]."x)\n";
+                    $mensagem_duplicadas = $mensagem_duplicadas.$usuario[0]." - ".$usuario[1]." (".$usuario[2]."x)\n";
                 }
             }
         }
