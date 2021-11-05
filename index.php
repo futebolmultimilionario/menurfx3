@@ -531,9 +531,9 @@ function verifica_apostas_concluidas($array_aposta){
         if($controle_naofeitas == 1 or $controle_duplicadas == 1){
             $mensagem = $mensagem."*".$key."*\n";
             if($controle_naofeitas == 1){
-                $mensagem = "\n".$mensagem.$mensagem_naofeitas;
+                $mensagem = "\n".$mensagem.$mensagem_naofeitas."\n";
             }if($controle_duplicadas == 1){
-                $mensagem = "\n".$mensagem.$mensagem_duplicadas;
+                $mensagem = "\n".$mensagem.$mensagem_duplicadas."\n";
             }
         }
     }
