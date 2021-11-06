@@ -638,9 +638,13 @@ if(!empty($texto) and empty($array_conversa['menu'])){
     $update_menu = "UPDATE chat SET hora='$hora', menu='$menu' WHERE numero=1";
     $atualiza_menu = pg_query($db_handle, $update_menu);
 }else if(is_numeric($texto) and $array_conversa['menu'] == 3 and ($array_conversa['hora'] + 1800) >= time()){
-
+    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1629250128@g.us&body=".urlencode("*Verificando apostas...*"));
     $mensagem = urlencode(verifica_apostas_concluidas(pega_partidas_db($texto)));
-    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1629250128@g.us&body=".$mensagem);
+    if($mensagem != ""){
+        file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1629250128@g.us&body=".$mensagem);
+    }else{
+        file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1629250128@g.us&body=".urlencode("✅ Todas as apostas foram enviadas com sucesso. Sem apostas duplicadas ou contas sem pegar!"));
+    }
 
     $db_handle = pg_connect("host=ec2-54-147-93-73.compute-1.amazonaws.com dbname=d8q4dlsoafqi5t port=5432 user=cqcnyvrfyyhzoo password=c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625");
     $deletar_query = "TRUNCATE TABLE aposta";
