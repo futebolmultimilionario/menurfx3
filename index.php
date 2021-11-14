@@ -81,7 +81,7 @@ function envia_contas_encerradas($usuarios, $partida){
                                                                     "flaviajanynne",
                                                                     "",
                                                                     ""),
-                            "luisfred2019" => array("17",
+                            "luisfred19" => array("17",
                                                                     "luisfred19",
                                                                     "",
                                                                     ""),
@@ -488,6 +488,10 @@ function verifica_apostas_concluidas($array_aposta){
                                                                     " ⚫"),
                             "contarfxinvesting51@gmail.com" => array("51",
                                                                     "carolineols",
+                                                                    "0",
+                                                                    " ⚫"),
+                            "contarfxinvesting52@gmail.com" => array("52",
+                                                                    "marcioespeto",
                                                                     "0",
                                                                     " ⚫"));
         $usuarios_aposta = array();
