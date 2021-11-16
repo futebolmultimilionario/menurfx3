@@ -203,7 +203,7 @@ curl_setopt_array($curl, array(
     $response = json_decode(curl_exec($curl), TRUE);
 
     curl_close($curl);
-    $ultimas_apostas = array_slice($response['Data'], 0, 79);
+    $ultimas_apostas = array_slice($response['Data'], 0, 99);
     return $ultimas_apostas;
 }
 
