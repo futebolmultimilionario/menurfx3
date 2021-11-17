@@ -105,6 +105,10 @@ function envia_contas_encerradas($usuarios, $partida){
                                                                     "thainamilanez",
                                                                     "",
                                                                     ""),
+                            "thaisrdg7" => array("39",
+                                                                    "thaisrdg7",
+                                                                    "",
+                                                                    ""),
                             "ster30" => array("43",
                                                                     "ster30",
                                                                     "",
@@ -203,7 +207,7 @@ curl_setopt_array($curl, array(
     $response = json_decode(curl_exec($curl), TRUE);
 
     curl_close($curl);
-    $ultimas_apostas = array_slice($response['Data'], 0, 99);
+    $ultimas_apostas = array_slice($response['Data'], 0, 79);
     return $ultimas_apostas;
 }
 
@@ -319,6 +323,10 @@ function muda_usuario($usuario, $status){
                                                                     " ⚫"),
                             "contarfxinvesting27@gmail.com" => array("27",
                                                                     "thainamilanez",
+                                                                    "",
+                                                                    " ⚫"),
+                            "contarfxinvesting39@gmail.com" => array("39",
+                                                                    "thaisrdg7",
                                                                     "",
                                                                     " ⚫"),
                             "contarfxinvesting43@gmail.com" => array("43",
@@ -476,6 +484,10 @@ function verifica_apostas_concluidas($array_aposta){
                                                                     " ⚫"),
                             "contarfxinvesting27@gmail.com" => array("27",
                                                                     "thainamilanez",
+                                                                    "0",
+                                                                    " ⚫"),
+                            "contarfxinvesting39@gmail.com" => array("39",
+                                                                    "thaisrdg7",
                                                                     "0",
                                                                     " ⚫"),
                             "contarfxinvesting43@gmail.com" => array("43",
