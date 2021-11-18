@@ -63,7 +63,7 @@ function pega_partidas_db($num_partidas){
 }
 
 function envia_contas_encerradas($usuarios, $partida){
-    $APIurl = "https://eu210.chat-api.com/instance219965/";
+    $APIurl = getenv('API_URL');
     $token = "1krwdq4lagx0dj1p";
     $array_usuarios = array("elenir19904" => array("04",
                                                                     "elenir19904",
@@ -566,8 +566,8 @@ function envia_dados($data){
     $result = curl_exec( $ch );
 }
 
-$APIurl = 'https://eu210.chat-api.com/instance219965/';
-$token = '1krwdq4lagx0dj1p';
+$APIurl = getenv('API_URL');
+$token = getenv('TOKEN');
 
 $requisicaocod = file_get_contents("php://input");
 $requisicao = json_decode($requisicaocod, TRUE);
