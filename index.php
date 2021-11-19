@@ -372,7 +372,7 @@ function pega_usuarios_painel($bloco){
     $i=0;
     foreach($response as $conta){
         $data_sync = strtotime(str_replace(["T", "Z"], " ", $conta['dataSync']));
-        if($conta['statusPainel'] == 1 and $conta['tipsterFixo'] == $bloco and $data_sync > $hoje){s
+        if($conta['statusPainel'] == 1 and $conta['tipsterFixo'] == $bloco and $data_sync > $hoje){
             $array_usuarios[$i]['numero'] = substr($conta['email'], strpos($conta['email'], '@gmail.com')-2, 2);
             $array_usuarios[$i]['email'] = $conta['email'];
             $array_usuarios[$i]['usuario'] = $conta['contaBet365'];
