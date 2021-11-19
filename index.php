@@ -54,17 +54,9 @@ function verifica_usuario($id, $usuarios_antigos, $partida){
     return $usuarios_novos;
 }
 
-function pega_partidas_db($num_partidas){
-    $db_handle = pg_connect("host=ec2-54-147-93-73.compute-1.amazonaws.com dbname=d8q4dlsoafqi5t port=5432 user=cqcnyvrfyyhzoo password=c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625");
-    $query = "SELECT * FROM aposta LIMIT '$num_partidas'";
-    $rs = pg_query($db_handle, $query);
-    $row = pg_fetch_all($rs);
-    return $row;
-}
-
 function envia_contas_encerradas($usuarios, $partida){
     $APIurl = getenv('API_URL');
-    $token = "1krwdq4lagx0dj1p";
+    $token = getenv('TOKEN');
     $contas_novas = atualiza_contas();
     $array_usuarios = [];
 
@@ -83,7 +75,7 @@ function envia_contas_encerradas($usuarios, $partida){
     foreach($array_usuarios as $usuario){
         $mensagem = $mensagem.urlencode($usuario[0]." - ".$usuario[1].$usuario[3]."\n");
     }
-    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1629251097@g.us&body=".$mensagem);
+    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1625143825@g.us&body=".$mensagem);
 
 }
 
@@ -156,7 +148,7 @@ curl_setopt_array($curl, array(
     $response = json_decode(curl_exec($curl), TRUE);
 
     curl_close($curl);
-    $ultimas_apostas = array_slice($response['Data'], 0, 79);
+    $ultimas_apostas = array_slice($response['Data'], 0, 29);
     return $ultimas_apostas;
 }
 
@@ -231,7 +223,75 @@ $response = json_decode(curl_exec($curl), TRUE);
 curl_close($curl);
 return $response['Data'];
 }
+function pega_partidas_db($num_partidas){
+    $db_handle = pg_connect("host=ec2-35-174-122-153.compute-1.amazonaws.com dbname=dbpgt1k6ka9m34 port=5432 user=phjjwnbbgnzyig password=7fd93b6bd124c6b4ad886d037db4acd289eeca46c4cc7484328896089fc3684e");
+    $query = "SELECT * FROM aposta LIMIT '$num_partidas'";
+    $rs = pg_query($db_handle, $query);
+    $row = pg_fetch_all($rs);
+    return $row;
+}
+function verifica_apostas_concluidas($array_aposta){
 
+    $array_aposta_cadastrada = array();
+    $i = 0;
+    foreach($array_aposta as $aposta){
+        foreach($array_aposta as $key => $aposta_duplicada){
+            if($aposta['partida'] == $aposta_duplicada['partida']){
+                $array_aposta_cadastrada[$aposta['partida']][] = $aposta_duplicada;
+                unset($array_aposta[$key]);
+            }
+        }
+        $i++;
+    }
+    $mensagem = "";
+    foreach($array_aposta_cadastrada as $key => $aposta){
+        $contas_novas = atualiza_contas();
+
+        $array_usuarios = [];
+
+        foreach($contas_novas as $conta){
+            $array_usuarios[$conta['email']][0] = $conta['numero'];
+            $array_usuarios[$conta['email']][1] = $conta['usuario'];
+            $array_usuarios[$conta['email']][2] = "0";
+            $array_usuarios[$conta['email']][3] = " ⚫";
+        }
+        $usuarios_aposta = array();
+        $controle_duplicadas = 0;
+        $controle_naofeitas = 0;
+        foreach($aposta as $aposta_duplicada){
+            $usuarios = verifica_usuarios($aposta_duplicada['id']);
+            foreach($usuarios as $usuario){
+                if($usuario['resultado'] == 0){
+                    $array_usuarios[$usuario['emailUsuario']][2]++;
+                }  
+            }
+        }
+        
+        $mensagem_duplicadas = "🔄 Contas duplicadas:\n";
+        $mensagem_naofeitas = "⛔ Contas que não fizeram:\n";
+        foreach($array_usuarios as $usuario){
+            if($usuario[2] != 1){
+                if($usuario[2] == 0){
+                    $controle_naofeitas = 1;
+                    $mensagem_naofeitas = $mensagem_naofeitas.$usuario[0]." - ".$usuario[1]."\n";
+                }if($usuario[2] > 1){
+                    $controle_duplicadas = 1;
+                    $mensagem_duplicadas = $mensagem_duplicadas.$usuario[0]." - ".$usuario[1]." (".$usuario[2]."x)\n";
+                }
+            }
+        }
+        
+        if($controle_naofeitas == 1 or $controle_duplicadas == 1){
+            $mensagem = $mensagem."*".$key."*\n\n";
+            if($controle_naofeitas == 1){
+                $mensagem = "\n".$mensagem.$mensagem_naofeitas."\n";
+            }if($controle_duplicadas == 1){
+                $mensagem = "\n".$mensagem.$mensagem_duplicadas."\n";
+            }
+        }
+    }
+    return $mensagem;
+}
 function muda_usuario($usuario, $status){
     $curl = curl_init();
     $contas_novas = atualiza_contas();
@@ -277,7 +337,7 @@ function muda_usuario($usuario, $status){
 }
 
 function seleciona_id_aposta($numero){
-    $db_handle = pg_connect("host=ec2-54-147-93-73.compute-1.amazonaws.com dbname=d8q4dlsoafqi5t port=5432 user=cqcnyvrfyyhzoo password=c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625");
+    $db_handle = pg_connect("host=ec2-35-174-122-153.compute-1.amazonaws.com dbname=dbpgt1k6ka9m34 port=5432 user=phjjwnbbgnzyig password=7fd93b6bd124c6b4ad886d037db4acd289eeca46c4cc7484328896089fc3684e");
     $seleciona_id = "SELECT id FROM aposta WHERE numero='$numero'";
     $result = pg_query($db_handle, $seleciona_id);
     $row = pg_fetch_assoc($result);
@@ -286,7 +346,7 @@ function seleciona_id_aposta($numero){
 }
 
 function seleciona_partida_aposta($id){
-    $db_handle = pg_connect("host=ec2-54-147-93-73.compute-1.amazonaws.com dbname=d8q4dlsoafqi5t port=5432 user=cqcnyvrfyyhzoo password=c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625");
+    $db_handle = pg_connect("host=ec2-35-174-122-153.compute-1.amazonaws.com dbname=dbpgt1k6ka9m34 port=5432 user=phjjwnbbgnzyig password=7fd93b6bd124c6b4ad886d037db4acd289eeca46c4cc7484328896089fc3684e");
     $seleciona_partida = "SELECT partida FROM aposta WHERE id='$id'";
     $result = pg_query($db_handle, $seleciona_partida);
     $row = pg_fetch_assoc($result);
@@ -295,13 +355,13 @@ function seleciona_partida_aposta($id){
 }
 
 function cadastra_apostas($apostas){
-    $db_handle = pg_connect("host=ec2-54-147-93-73.compute-1.amazonaws.com dbname=d8q4dlsoafqi5t port=5432 user=cqcnyvrfyyhzoo password=c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625");
+    $db_handle = pg_connect("host=ec2-35-174-122-153.compute-1.amazonaws.com dbname=dbpgt1k6ka9m34 port=5432 user=phjjwnbbgnzyig password=7fd93b6bd124c6b4ad886d037db4acd289eeca46c4cc7484328896089fc3684e");
     $deletar_query = "TRUNCATE TABLE aposta";
     $deletar_dados = pg_query($db_handle, $deletar_query);
 
     $i = 1;
     foreach($apostas as $aposta){
-        if($aposta['tipsterAtivo'] == 'Bloco D'){
+        if($aposta['tipsterAtivo'] == 'Fernando'){
             $id = $aposta['matchID'];
             $id2 = json_decode($aposta['dadosAposta'], TRUE)['betId'];
             $partida = $aposta['evento']." - ".$aposta['mercado']." - ".$aposta['aposta'];
@@ -313,7 +373,7 @@ function cadastra_apostas($apostas){
 }
 
 function seleciona_id2($numero){
-    $db_handle = pg_connect("host=ec2-54-147-93-73.compute-1.amazonaws.com dbname=d8q4dlsoafqi5t port=5432 user=cqcnyvrfyyhzoo password=c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625");
+    $db_handle = pg_connect("host=ec2-35-174-122-153.compute-1.amazonaws.com dbname=dbpgt1k6ka9m34 port=5432 user=phjjwnbbgnzyig password=7fd93b6bd124c6b4ad886d037db4acd289eeca46c4cc7484328896089fc3684e");
     $seleciona_id2 = "SELECT id2 FROM aposta WHERE numero='$numero'";
     $result = pg_query($db_handle, $seleciona_id2);
     $row = pg_fetch_assoc($result);
@@ -322,7 +382,7 @@ function seleciona_id2($numero){
 }
 
 function seleciona_numeropartida(){
-    $db_handle = pg_connect("host=ec2-54-147-93-73.compute-1.amazonaws.com dbname=d8q4dlsoafqi5t port=5432 user=cqcnyvrfyyhzoo password=c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625");
+    $db_handle = pg_connect("host=ec2-35-174-122-153.compute-1.amazonaws.com dbname=dbpgt1k6ka9m34 port=5432 user=phjjwnbbgnzyig password=7fd93b6bd124c6b4ad886d037db4acd289eeca46c4cc7484328896089fc3684e");
     $seleciona_numeropartida = "SELECT numeropartida FROM chat WHERE menu='5'";
     $result = pg_query($db_handle, $seleciona_numeropartida);
     $row = pg_fetch_assoc($result);
@@ -386,7 +446,7 @@ function pega_usuarios_painel($bloco){
     }, $array_usuarios), SORT_ASC, $array_usuarios);
     
     
-    $db_handle = pg_connect("host=ec2-54-147-93-73.compute-1.amazonaws.com dbname=d8q4dlsoafqi5t port=5432 user=cqcnyvrfyyhzoo password=c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625");
+    $db_handle = pg_connect("host=ec2-35-174-122-153.compute-1.amazonaws.com dbname=dbpgt1k6ka9m34 port=5432 user=phjjwnbbgnzyig password=7fd93b6bd124c6b4ad886d037db4acd289eeca46c4cc7484328896089fc3684e");
     $deletar_query = "TRUNCATE TABLE contas";
     $deletar_dados = pg_query($db_handle, $deletar_query);
     
@@ -397,14 +457,10 @@ function pega_usuarios_painel($bloco){
         $adicionar_query = "INSERT INTO contas (numero, email, usuario) VALUES ('$numero', '$email', '$conta')";
         $adicionar_dados = pg_query($db_handle, $adicionar_query);
     }
-    
-    
-    
-    
     }
 
     function atualiza_contas(){
-        $db_handle = pg_connect("host=ec2-54-147-93-73.compute-1.amazonaws.com dbname=d8q4dlsoafqi5t port=5432 user=cqcnyvrfyyhzoo password=c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625");
+        $db_handle = pg_connect("host=ec2-35-174-122-153.compute-1.amazonaws.com dbname=dbpgt1k6ka9m34 port=5432 user=phjjwnbbgnzyig password=7fd93b6bd124c6b4ad886d037db4acd289eeca46c4cc7484328896089fc3684e");
         $query = "SELECT * FROM contas";
         $rs = pg_query($db_handle, $query);
         $row = pg_fetch_all($rs);
@@ -412,73 +468,10 @@ function pega_usuarios_painel($bloco){
         return $row;
     }
 
-function verifica_apostas_concluidas($array_aposta){
-
-    $array_aposta_cadastrada = array();
-    $i = 0;
-    foreach($array_aposta as $aposta){
-        foreach($array_aposta as $key => $aposta_duplicada){
-            if($aposta['partida'] == $aposta_duplicada['partida']){
-                $array_aposta_cadastrada[$aposta['partida']][] = $aposta_duplicada;
-                unset($array_aposta[$key]);
-            }
-        }
-        $i++;
-    }
-    $mensagem = "";
-    foreach($array_aposta_cadastrada as $key => $aposta){
-        $contas_novas = atualiza_contas();
-
-        $array_usuarios = [];
-
-        foreach($contas_novas as $conta){
-            $array_usuarios[$conta['email']][0] = $conta['numero'];
-            $array_usuarios[$conta['email']][1] = $conta['usuario'];
-            $array_usuarios[$conta['email']][2] = "0";
-            $array_usuarios[$conta['email']][3] = " ⚫";
-        }
-        $usuarios_aposta = array();
-        $controle_duplicadas = 0;
-        $controle_naofeitas = 0;
-        foreach($aposta as $aposta_duplicada){
-            $usuarios = verifica_usuarios($aposta_duplicada['id']);
-            foreach($usuarios as $usuario){
-                if($usuario['resultado'] == 0){
-                    $array_usuarios[$usuario['emailUsuario']][2]++;
-                }  
-            }
-        }
-        
-        $mensagem_duplicadas = "🔄 Contas duplicadas:\n";
-        $mensagem_naofeitas = "⛔ Contas que não fizeram:\n";
-        foreach($array_usuarios as $usuario){
-            if($usuario[2] != 1){
-                if($usuario[2] == 0){
-                    $controle_naofeitas = 1;
-                    $mensagem_naofeitas = $mensagem_naofeitas.$usuario[0]." - ".$usuario[1]."\n";
-                }if($usuario[2] > 1){
-                    $controle_duplicadas = 1;
-                    $mensagem_duplicadas = $mensagem_duplicadas.$usuario[0]." - ".$usuario[1]." (".$usuario[2]."x)\n";
-                }
-            }
-        }
-        
-        if($controle_naofeitas == 1 or $controle_duplicadas == 1){
-            $mensagem = $mensagem."*".$key."*\n\n";
-            if($controle_naofeitas == 1){
-                $mensagem = "\n".$mensagem.$mensagem_naofeitas."\n";
-            }if($controle_duplicadas == 1){
-                $mensagem = "\n".$mensagem.$mensagem_duplicadas."\n";
-            }
-        }
-    }
-    return $mensagem;
-}
-
 function envia_dados($data){
     $data_string = json_encode($data);
 
-    $url = "https://menurfx3.herokuapp.com";
+    $url = "https://menurfx2.herokuapp.com";
 
     $headr = array();
     $headr[] = 'Content-length: '.strlen( $data_string );
@@ -509,14 +502,14 @@ $texto = urlencode($requisicao["messages"][0]["body"]);
 
 $minha = $requisicao["messages"][0]['fromMe'];
 
-$db_handle = pg_connect("host=ec2-54-147-93-73.compute-1.amazonaws.com dbname=d8q4dlsoafqi5t port=5432 user=cqcnyvrfyyhzoo password=c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625");
+$db_handle = pg_connect("host=ec2-35-174-122-153.compute-1.amazonaws.com dbname=dbpgt1k6ka9m34 port=5432 user=phjjwnbbgnzyig password=7fd93b6bd124c6b4ad886d037db4acd289eeca46c4cc7484328896089fc3684e");
 $conversa_query = "SELECT * FROM chat WHERE numero=1";
 $seleciona_conversa = pg_query($db_handle, $conversa_query);
 $array_conversa = pg_fetch_array($seleciona_conversa, 0);
 
 if(!empty($texto) and empty($array_conversa['menu'])){
-    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1629250128@g.us&body=".urlencode("*Selecione a opção desejada:*\n\n*1.* Reenviar apostas\n*2.* Religar todas as contas\n*3.* Verificar apostas\n*4.* ⚠️ Encerrar Aposta\n*5.* Atualizar contas"));
-    $db_handle = pg_connect("host=ec2-54-147-93-73.compute-1.amazonaws.com dbname=d8q4dlsoafqi5t port=5432 user=cqcnyvrfyyhzoo password=c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625");
+    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1625143773@g.us&body=".urlencode("*Selecione a opção desejada:*\n\n*1.* Reenviar apostas\n*2.* Religar todas as contas\n*3.* Verificar apostas\n*4.* ⚠️ Encerrar Aposta\n*5.* Atualizar contas"));
+    $db_handle = pg_connect("host=ec2-35-174-122-153.compute-1.amazonaws.com dbname=dbpgt1k6ka9m34 port=5432 user=phjjwnbbgnzyig password=7fd93b6bd124c6b4ad886d037db4acd289eeca46c4cc7484328896089fc3684e");
     $menu = 1;
     $hora = time();
     $menu_query = "UPDATE chat SET hora='$hora', menu='$menu' WHERE numero=1";
@@ -526,16 +519,16 @@ if(!empty($texto) and empty($array_conversa['menu'])){
     $apostas = requisitar_apostas();
     $i = 1;
     foreach($apostas as $aposta){
-        if($aposta['tipsterAtivo'] == 'Bloco D'){
+        if($aposta['tipsterAtivo'] == 'Fernando'){
         $mensagem = $mensagem.urlencode("*".$i.".* ".$aposta['evento']." - ".$aposta['aposta']."\n");
         $i++;
         }
     }
-    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1629250128@g.us&body=".$mensagem);
+    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1625143773@g.us&body=".$mensagem);
     cadastra_apostas($apostas);
     $hora = time();
     $menu = 2;
-    $db_handle = pg_connect("host=ec2-54-147-93-73.compute-1.amazonaws.com dbname=d8q4dlsoafqi5t port=5432 user=cqcnyvrfyyhzoo password=c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625");
+    $db_handle = pg_connect("host=ec2-35-174-122-153.compute-1.amazonaws.com dbname=dbpgt1k6ka9m34 port=5432 user=phjjwnbbgnzyig password=7fd93b6bd124c6b4ad886d037db4acd289eeca46c4cc7484328896089fc3684e");
     $update_menu = "UPDATE chat SET hora='$hora', menu='$menu' WHERE numero=1";
     $atualiza_menu = pg_query($db_handle, $update_menu);
 }else if($texto == "4" and $array_conversa['menu'] == 1 and ($array_conversa['hora'] + 1800) >= time()){
@@ -543,16 +536,16 @@ if(!empty($texto) and empty($array_conversa['menu'])){
     $apostas = requisitar_apostas();
     $i = 1;
     foreach($apostas as $aposta){
-        if($aposta['tipsterAtivo'] == 'Bloco D'){
+        if($aposta['tipsterAtivo'] == 'Fernando'){
         $mensagem = $mensagem.urlencode("*".$i.".* ".$aposta['evento']." - ".$aposta['aposta']."\n");
         $i++;
         }
     }
-    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1629250128@g.us&body=".$mensagem);
+    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1625143773@g.us&body=".$mensagem);
     cadastra_apostas($apostas);
     $hora = time();
     $menu = 4;
-    $db_handle = pg_connect("host=ec2-54-147-93-73.compute-1.amazonaws.com dbname=d8q4dlsoafqi5t port=5432 user=cqcnyvrfyyhzoo password=c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625");
+    $db_handle = pg_connect("host=ec2-35-174-122-153.compute-1.amazonaws.com dbname=dbpgt1k6ka9m34 port=5432 user=phjjwnbbgnzyig password=7fd93b6bd124c6b4ad886d037db4acd289eeca46c4cc7484328896089fc3684e");
     $update_menu = "UPDATE chat SET hora='$hora', menu='$menu' WHERE numero=1";
     $atualiza_menu = pg_query($db_handle, $update_menu);
 }else if($texto == "3" and $array_conversa['menu'] == 1 and ($array_conversa['hora'] + 1800) >= time()){
@@ -560,28 +553,27 @@ if(!empty($texto) and empty($array_conversa['menu'])){
     $apostas = requisitar_apostas();
     $i = 1;
     foreach($apostas as $aposta){
-        if($aposta['tipsterAtivo'] == 'Bloco D'){
+        if($aposta['tipsterAtivo'] == 'Fernando'){
         $mensagem = $mensagem.urlencode("*".$i.".* ".$aposta['evento']." - ".$aposta['aposta']."\n");
         $i++;
         }
     }
-    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1629250128@g.us&body=".$mensagem);
+    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1625143773@g.us&body=".$mensagem);
     cadastra_apostas($apostas);
     $hora = time();
     $menu = 3;
-    $db_handle = pg_connect("host=ec2-54-147-93-73.compute-1.amazonaws.com dbname=d8q4dlsoafqi5t port=5432 user=cqcnyvrfyyhzoo password=c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625");
+    $db_handle = pg_connect("host=ec2-35-174-122-153.compute-1.amazonaws.com dbname=dbpgt1k6ka9m34 port=5432 user=phjjwnbbgnzyig password=7fd93b6bd124c6b4ad886d037db4acd289eeca46c4cc7484328896089fc3684e");
     $update_menu = "UPDATE chat SET hora='$hora', menu='$menu' WHERE numero=1";
     $atualiza_menu = pg_query($db_handle, $update_menu);
 }else if(is_numeric($texto) and $array_conversa['menu'] == 3 and ($array_conversa['hora'] + 1800) >= time()){
-    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1629250128@g.us&body=".urlencode("*Verificando apostas...*"));
+    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1625143773@g.us&body=".urlencode("*Verificando apostas...*"));
     $mensagem = urlencode(verifica_apostas_concluidas(pega_partidas_db($texto)));
     if($mensagem != ""){
-        file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1629250128@g.us&body=".$mensagem);
+        file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1625143773@g.us&body=".$mensagem);
     }else{
-        file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1629250128@g.us&body=".urlencode("✅ Todas as apostas foram enviadas com sucesso. Sem apostas duplicadas ou contas sem pegar!"));
+        file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1625143773@g.us&body=".urlencode("✅ Todas as apostas foram enviadas com sucesso. Sem apostas duplicadas ou contas sem pegar!"));
     }
-
-    $db_handle = pg_connect("host=ec2-54-147-93-73.compute-1.amazonaws.com dbname=d8q4dlsoafqi5t port=5432 user=cqcnyvrfyyhzoo password=c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625");
+    $db_handle = pg_connect("host=ec2-35-174-122-153.compute-1.amazonaws.com dbname=dbpgt1k6ka9m34 port=5432 user=phjjwnbbgnzyig password=7fd93b6bd124c6b4ad886d037db4acd289eeca46c4cc7484328896089fc3684e");
     $deletar_query = "TRUNCATE TABLE aposta";
     $deletar_dados = pg_query($db_handle, $deletar_query);
     $deletar2_query = "TRUNCATE TABLE chat";
@@ -593,15 +585,15 @@ if(!empty($texto) and empty($array_conversa['menu'])){
     $partida = seleciona_partida_aposta($id);
     $menu = 5;
     $hora = time();
-    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1629250128@g.us&body=".urlencode("*⚠️ Deseja realmente encerrar a seguinte aposta? ".$partida."*\n\n1. Sim\n2. Não"));
-    $db_handle = pg_connect("host=ec2-54-147-93-73.compute-1.amazonaws.com dbname=d8q4dlsoafqi5t port=5432 user=cqcnyvrfyyhzoo password=c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625");
+    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1625143773@g.us&body=".urlencode("*⚠️ Deseja realmente encerrar a seguinte aposta? ".$partida."*\n\n1. Sim\n2. Não"));
+    $db_handle = pg_connect("host=ec2-35-174-122-153.compute-1.amazonaws.com dbname=dbpgt1k6ka9m34 port=5432 user=phjjwnbbgnzyig password=7fd93b6bd124c6b4ad886d037db4acd289eeca46c4cc7484328896089fc3684e");
     $update_menu = "UPDATE chat SET hora='$hora', menu='$menu', numeropartida = '$texto' WHERE numero=1";
     $atualiza_menu = pg_query($db_handle, $update_menu);
 }else if((strtolower($texto) == "sim" or $texto == "1") and $array_conversa['menu'] == 5 and ($array_conversa['hora'] + 1800) >= time()){
     $numeropartida = seleciona_numeropartida();
     $id2 = seleciona_id2($numeropartida);
     encerra_aposta($id2);
-    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1629250128@g.us&body=".urlencode("*⚠️ Comando de encerrar enviado!*"));
+    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1625143773@g.us&body=".urlencode("*⚠️ Comando de encerrar enviado!*"));
     $usuarios_antigos = array();
     $id = seleciona_id_aposta($numeropartida);
     $partida = seleciona_partida_aposta($id);
@@ -613,7 +605,7 @@ if(!empty($texto) and empty($array_conversa['menu'])){
 
     envia_dados($data);
 
-    $db_handle = pg_connect("host=ec2-54-147-93-73.compute-1.amazonaws.com dbname=d8q4dlsoafqi5t port=5432 user=cqcnyvrfyyhzoo password=c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625");
+    $db_handle = pg_connect("host=ec2-35-174-122-153.compute-1.amazonaws.com dbname=dbpgt1k6ka9m34 port=5432 user=phjjwnbbgnzyig password=7fd93b6bd124c6b4ad886d037db4acd289eeca46c4cc7484328896089fc3684e");
     $deletar_query = "TRUNCATE TABLE aposta";
     $deletar_dados = pg_query($db_handle, $deletar_query);
     $deletar2_query = "TRUNCATE TABLE chat";
@@ -622,7 +614,7 @@ if(!empty($texto) and empty($array_conversa['menu'])){
     $reiniciar_dados = pg_query($db_handle, $reiniciar);
 }
 else if(is_numeric($texto) and $array_conversa['menu'] == 2 and ($array_conversa['hora'] + 1800) >= time()){
-    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1629250128@g.us&body=".urlencode("*Desligando contas. Aguarde...*"));
+    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1625143773@g.us&body=".urlencode("*Desligando contas. Aguarde...*"));
     $id = seleciona_id_aposta($texto);
     $usuarios = verifica_usuarios($id);
     $email_usuarios_pegaram = array();
@@ -647,8 +639,8 @@ else if(is_numeric($texto) and $array_conversa['menu'] == 2 and ($array_conversa
     foreach($array_usuarios as $usuario){
         $mensagem = $mensagem.urlencode($usuario[0]." - ".$usuario[1]."  ".$usuario[2]."\n");
     }
-    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1629250128@g.us&body=".$mensagem);
-    $db_handle = pg_connect("host=ec2-54-147-93-73.compute-1.amazonaws.com dbname=d8q4dlsoafqi5t port=5432 user=cqcnyvrfyyhzoo password=c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625");
+    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1625143773@g.us&body=".$mensagem);
+    $db_handle = pg_connect("host=ec2-35-174-122-153.compute-1.amazonaws.com dbname=dbpgt1k6ka9m34 port=5432 user=phjjwnbbgnzyig password=7fd93b6bd124c6b4ad886d037db4acd289eeca46c4cc7484328896089fc3684e");
     $deletar_query = "TRUNCATE TABLE aposta";
     $deletar_dados = pg_query($db_handle, $deletar_query);
     $deletar2_query = "TRUNCATE TABLE chat";
@@ -656,7 +648,7 @@ else if(is_numeric($texto) and $array_conversa['menu'] == 2 and ($array_conversa
     $reiniciar =  "INSERT INTO chat (numero) VALUES (1)";
     $reiniciar_dados = pg_query($db_handle, $reiniciar);
 }else if($texto == "2" and $array_conversa['menu'] == 1 and ($array_conversa['hora'] + 1800)>= time()){
-    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1629250128@g.us&body=".urlencode("*Religando contas. Aguarde...*"));
+    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1625143773@g.us&body=".urlencode("*Religando contas. Aguarde...*"));
     $usuarios = verifica_status();
     foreach($usuarios as $usuario){
         $array_usuarios = muda_usuario($usuario['email'], 1);
@@ -675,8 +667,8 @@ else if(is_numeric($texto) and $array_conversa['menu'] == 2 and ($array_conversa
     foreach($array_usuarios as $usuario){
         $mensagem = $mensagem.urlencode($usuario[0]." - ".$usuario[1]."  ".$usuario[2]."\n");
     }
-    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1629250128@g.us&body=".$mensagem);
-    $db_handle = pg_connect("host=ec2-54-147-93-73.compute-1.amazonaws.com dbname=d8q4dlsoafqi5t port=5432 user=cqcnyvrfyyhzoo password=c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625");
+    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1625143773@g.us&body=".$mensagem);
+    $db_handle = pg_connect("host=ec2-35-174-122-153.compute-1.amazonaws.com dbname=dbpgt1k6ka9m34 port=5432 user=phjjwnbbgnzyig password=7fd93b6bd124c6b4ad886d037db4acd289eeca46c4cc7484328896089fc3684e");
     $deletar_query = "TRUNCATE TABLE aposta";
     $deletar_dados = pg_query($db_handle, $deletar_query);
     $deletar2_query = "TRUNCATE TABLE chat";
@@ -685,14 +677,14 @@ else if(is_numeric($texto) and $array_conversa['menu'] == 2 and ($array_conversa
     $reiniciar_dados = pg_query($db_handle, $reiniciar);
 }else if($texto == "5" and $array_conversa['menu'] == 1 and ($array_conversa['hora'] + 1800)>= time()){
     file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1629250128@g.us&body=".urlencode("*Usuários sendo atualizados. Aguarde...*"));
-    pega_usuarios_painel('611c3798ff007d251cc7a8bb');
+    pega_usuarios_painel('60b1284d654e570b388ca992');
     $contas = atualiza_contas();
     $mensagem = urlencode("*Usuários atualizados:*\n\n");
     foreach($contas as $usuario){
         $mensagem = $mensagem.urlencode($usuario['numero']." - ".$usuario['usuario']."  🟢\n");
     }
-    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1629250128@g.us&body=".$mensagem);
-    $db_handle = pg_connect("host=ec2-54-147-93-73.compute-1.amazonaws.com dbname=d8q4dlsoafqi5t port=5432 user=cqcnyvrfyyhzoo password=c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625");
+    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1625143773@g.us&body=".$mensagem);
+    $db_handle = pg_connect("host=ec2-35-174-122-153.compute-1.amazonaws.com dbname=dbpgt1k6ka9m34 port=5432 user=phjjwnbbgnzyig password=7fd93b6bd124c6b4ad886d037db4acd289eeca46c4cc7484328896089fc3684e");
     $deletar_query = "TRUNCATE TABLE aposta";
     $deletar_dados = pg_query($db_handle, $deletar_query);
     $deletar2_query = "TRUNCATE TABLE chat";
@@ -700,14 +692,14 @@ else if(is_numeric($texto) and $array_conversa['menu'] == 2 and ($array_conversa
     $reiniciar =  "INSERT INTO chat (numero) VALUES (1)";
     $reiniciar_dados = pg_query($db_handle, $reiniciar);
 }else{
-    $db_handle = pg_connect("host=ec2-54-147-93-73.compute-1.amazonaws.com dbname=d8q4dlsoafqi5t port=5432 user=cqcnyvrfyyhzoo password=c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625");
+    $db_handle = pg_connect("host=ec2-35-174-122-153.compute-1.amazonaws.com dbname=dbpgt1k6ka9m34 port=5432 user=phjjwnbbgnzyig password=7fd93b6bd124c6b4ad886d037db4acd289eeca46c4cc7484328896089fc3684e");
     $deletar_query = "TRUNCATE TABLE aposta";
     $deletar_dados = pg_query($db_handle, $deletar_query);
     $deletar2_query = "TRUNCATE TABLE chat";
     $deletar2_dados = pg_query($db_handle, $deletar2_query);
     $reiniciar =  "INSERT INTO chat (numero) VALUES (1)";
     $reiniciar_dados = pg_query($db_handle, $reiniciar);
-    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1629250128@g.us&body=".urlencode("*Selecione a opção desejada:*\n\n*1.* Reenviar apostas\n*2.* Religar todas as contas\n*3.* Verificar apostas\n*4.* ⚠️ Encerrar Aposta\n*5.* Atualizar contas"));
+    file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1625143773@g.us&body=".urlencode("*Selecione a opção desejada:*\n\n*1.* Reenviar apostas\n*2.* Religar todas as contas\n*3.* Verificar apostas\n*4.* ⚠️ Encerrar Aposta\n*5.* Atualizar contas"));
     $menu = 1;
     $hora = time();
     $menu_query = "UPDATE chat SET hora='$hora', menu='$menu' WHERE numero=1";
