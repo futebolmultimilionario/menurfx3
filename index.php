@@ -163,8 +163,9 @@ curl_setopt_array($curl, array(
 function verifica_usuarios($id){
     $curl = curl_init();
 
+
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://automatips.com.br/api/Bot/getBetsUser?token=soMe6uEUlLUIi6aslS1v7ons5EHGbnTkUQDMl9inUveRfXSpIEgdsQqeKGvdF3a&matchid='.$id.'&tokenAplicacao=JOS2F00AF043DBB75A3B12F28A5D4A1391A48EE9DD3DF424F840C63BCD3345CE02A&_=1630162602507',
+  CURLOPT_URL => 'https://automatips.com.br/api/Adm/getLogAposta?token=YBknWTkY6FUER0owiPffbMSucHbRvqFnSxgUR7TasBXEuW1YLqBda0wi2KgQO&idAposta='.$id.'&tokenAplicacao=JOS2F00AF043DBB75A3B12F28A5D4A1391A48EE9DD3DF424F840C63BCD3345CE02A&_=1637321206634',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -174,27 +175,35 @@ curl_setopt_array($curl, array(
   CURLOPT_CUSTOMREQUEST => 'GET',
   CURLOPT_HTTPHEADER => array(
     'authority: automatips.com.br',
-    'sec-ch-ua: "Chromium";v="92", " Not A;Brand";v="99", "Google Chrome";v="92"',
+    'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="96", "Google Chrome";v="96"',
     'accept: application/json, text/javascript, */*; q=0.01',
     'cache-control: no-cache',
     'x-requested-with: XMLHttpRequest',
     'sec-ch-ua-mobile: ?0',
-    'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36',
+    'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36',
+    'sec-ch-ua-platform: "Windows"',
     'sec-fetch-site: same-origin',
     'sec-fetch-mode: cors',
     'sec-fetch-dest: empty',
     'referer: https://automatips.com.br/v2/dashboardAdm.html',
-    'accept-language: pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
-    'cookie: token="soMe6uEUlLUIi6aslS1v7ons5EHGbnTkUQDMl9inUveRfXSpIEgdsQqeKGvdF3a"; tokenAplicacao=JOS2F00AF043DBB75A3B12F28A5D4A1391A48EE9DD3DF424F840C63BCD3345CE02A; Servidor=http://automatips.com.br:7009; emailLogin=josealberto.gomes@hotmail.com; dtVen=2021-08-29T02:40:16Z'
+    'accept-language: pt-PT,pt;q=0.9,en-US;q=0.8,en;q=0.7',
+    'cookie: token="YBknWTkY6FUER0owiPffbMSucHbRvqFnSxgUR7TasBXEuW1YLqBda0wi2KgQO"; tokenAplicacao=JOS2F00AF043DBB75A3B12F28A5D4A1391A48EE9DD3DF424F840C63BCD3345CE02A; Servidor=http://automatips.com.br:7009; emailLogin=josealberto.gomes@hotmail.com; dtVen=2021-11-30T02:40:16Z'
   ),
 ));
 
+    $response = json_decode(curl_exec($curl), TRUE)['Data'];
 
-    $response = json_decode(curl_exec($curl), TRUE);
+    $usuarios = array();
+
+    foreach($response as $log){
+        if($log['logTexto'] == "Aposta realizada com sucesso!"){
+            $usuarios[] = $log['contausuario'];
+        }
+    }
 
     curl_close($curl);
 
-    return $response['Data'];
+    return $usuarios;
 }
 
 function verifica_status(){
@@ -412,68 +421,66 @@ function pega_usuarios_painel($bloco){
         return $row;
     }
 
-function verifica_apostas_concluidas($array_aposta){
-
-    $array_aposta_cadastrada = array();
-    $i = 0;
-    foreach($array_aposta as $aposta){
-        foreach($array_aposta as $key => $aposta_duplicada){
-            if($aposta['partida'] == $aposta_duplicada['partida']){
-                $array_aposta_cadastrada[$aposta['partida']][] = $aposta_duplicada;
-                unset($array_aposta[$key]);
-            }
-        }
-        $i++;
-    }
-    $mensagem = "";
-    foreach($array_aposta_cadastrada as $key => $aposta){
-        $contas_novas = atualiza_contas();
-
-        $array_usuarios = [];
-
-        foreach($contas_novas as $conta){
-            $array_usuarios[$conta['email']][0] = $conta['numero'];
-            $array_usuarios[$conta['email']][1] = $conta['usuario'];
-            $array_usuarios[$conta['email']][2] = "0";
-            $array_usuarios[$conta['email']][3] = " ⚫";
-        }
-        $usuarios_aposta = array();
-        $controle_duplicadas = 0;
-        $controle_naofeitas = 0;
-        foreach($aposta as $aposta_duplicada){
-            $usuarios = verifica_usuarios($aposta_duplicada['id']);
-            foreach($usuarios as $usuario){
-                if($usuario['resultado'] == 0){
-                    $array_usuarios[$usuario['emailUsuario']][2]++;
-                }  
-            }
-        }
-        
-        $mensagem_duplicadas = "🔄 Contas duplicadas:\n";
-        $mensagem_naofeitas = "⛔ Contas que não fizeram:\n";
-        foreach($array_usuarios as $usuario){
-            if($usuario[2] != 1){
-                if($usuario[2] == 0){
-                    $controle_naofeitas = 1;
-                    $mensagem_naofeitas = $mensagem_naofeitas.$usuario[0]." - ".$usuario[1]."\n";
-                }if($usuario[2] > 1){
-                    $controle_duplicadas = 1;
-                    $mensagem_duplicadas = $mensagem_duplicadas.$usuario[0]." - ".$usuario[1]." (".$usuario[2]."x)\n";
+    function verifica_apostas_concluidas($array_aposta){
+        $array_aposta_cadastrada = array();
+        $i = 0;
+        foreach($array_aposta as $aposta){
+            foreach($array_aposta as $key => $aposta_duplicada){
+                if($aposta['partida'] == $aposta_duplicada['partida']){
+                    $array_aposta_cadastrada[$aposta['partida']][] = $aposta_duplicada;
+                    unset($array_aposta[$key]);
                 }
             }
+            $i++;
         }
-        
-        if($controle_naofeitas == 1 or $controle_duplicadas == 1){
-            $mensagem = $mensagem."*".$key."*\n\n";
-            if($controle_naofeitas == 1){
-                $mensagem = "\n".$mensagem.$mensagem_naofeitas."\n";
-            }if($controle_duplicadas == 1){
-                $mensagem = "\n".$mensagem.$mensagem_duplicadas."\n";
+        $mensagem = "";
+        foreach($array_aposta_cadastrada as $key => $aposta){
+            $contas_novas = atualiza_contas();
+    
+            $array_usuarios = [];
+    
+            foreach($contas_novas as $conta){
+                $array_usuarios[$conta['usuario']][0] = $conta['numero'];
+                $array_usuarios[$conta['usuario']][1] = $conta['usuario'];
+                $array_usuarios[$conta['usuario']][2] = "0";
+                $array_usuarios[$conta['usuario']][3] = " ⚫";
             }
+            $usuarios_aposta = array();
+            $controle_duplicadas = 0;
+            $controle_naofeitas = 0;
+            foreach($aposta as $aposta_duplicada){
+                $usuarios = verifica_usuarios($aposta_duplicada['id']);
+                foreach($usuarios as $usuario){
+                        $array_usuarios[$usuario][2]++;
+                }
+            }
+            
+            $mensagem_duplicadas = "🔄 Contas duplicadas:\n";
+            $mensagem_naofeitas = "⛔ Contas que não fizeram:\n";
+            foreach($array_usuarios as $usuario){
+                if($usuario[2] != 1){
+                    if($usuario[2] == 0){
+                        $controle_naofeitas = 1;
+                        $mensagem_naofeitas = $mensagem_naofeitas.$usuario[0]." - ".$usuario[1]."\n";
+                    }if($usuario[2] > 1){
+                        $controle_duplicadas = 1;
+                        $mensagem_duplicadas = $mensagem_duplicadas.$usuario[0]." - ".$usuario[1]." (".$usuario[2]."x)\n";
+                    }
+                }
+            }
+            
+            if($controle_naofeitas == 1 or $controle_duplicadas == 1){
+                $mensagem = $mensagem."*".$key."*\n\n";
+                if($controle_naofeitas == 1){
+                    $mensagem = "\n".$mensagem.$mensagem_naofeitas."\n";
+                }if($controle_duplicadas == 1){
+                    $mensagem = "\n".$mensagem.$mensagem_duplicadas."\n";
+                }
+            }
+            
         }
+        return $mensagem;
     }
-    return $mensagem;
-}
 
 function envia_dados($data){
     $data_string = json_encode($data);
@@ -625,13 +632,20 @@ else if(is_numeric($texto) and $array_conversa['menu'] == 2 and ($array_conversa
     file_get_contents($APIurl."sendMessage?token=".$token."&chatId=558399711150-1629250128@g.us&body=".urlencode("*Desligando contas. Aguarde...*"));
     $id = seleciona_id_aposta($texto);
     $usuarios = verifica_usuarios($id);
+    $contas_novas = atualiza_contas();
+    $usuarios_menu = [];
+    foreach($contas_novas as $conta){
+        $usuarios_menu[$conta['usuario']][0] = $conta['numero'];
+        $usuarios_menu[$conta['usuario']][1] = $conta['usuario'];
+        $usuarios_menu[$conta['usuario']][2] = $conta['email'];
+        $usuarios_menu[$conta['usuario']][3] = " ⚫";
+    }
     $email_usuarios_pegaram = array();
     $mensagem = urlencode("*Status dos Usuários:*\n\n");
     foreach($usuarios as $usuario){
-        if($usuario['resultado'] == 0){
-            $email_usuarios_pegaram[] = $usuario['emailUsuario'];
-            $array_usuarios = muda_usuario($usuario['emailUsuario'], 0);
-        }
+
+            $email_usuarios_pegaram[] = $usuarios_menu[$usuario][2];
+            $array_usuarios = muda_usuario($usuarios_menu[$usuario][2], 0);
     }
     $status = verifica_status();
 
