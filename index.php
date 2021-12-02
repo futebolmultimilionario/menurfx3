@@ -376,7 +376,7 @@ function pega_usuarios_painel($bloco){
     
     $array_usuarios = array();
     
-    date_default_timezone_set("America/Bahia");
+    date_default_timezone_set("Europe/London");
     $hoje = strtotime(date("Y-m-d"));
     $i=0;
     foreach($response as $conta){
