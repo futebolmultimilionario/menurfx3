@@ -307,14 +307,14 @@ function cadastra_apostas($apostas){
     $db_handle = pg_connect("host=ec2-54-147-93-73.compute-1.amazonaws.com dbname=d8q4dlsoafqi5t port=5432 user=cqcnyvrfyyhzoo password=c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625");
     $deletar_query = "TRUNCATE TABLE aposta";
     $deletar_dados = pg_query($db_handle, $deletar_query);
-    $link = mysqli_connect("ec2-54-147-93-73.compute-1.amazonaws.com:5432", "cqcnyvrfyyhzoo", "c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625", "d8q4dlsoafqi5t") or die($link);
+    //$link = mysqli_connect("ec2-54-147-93-73.compute-1.amazonaws.com:5432", "cqcnyvrfyyhzoo", "c7dfc5c9eade7b20eb4e7f1b7df52adc5f7c026ec5b38d59f968961ba92c0625", "d8q4dlsoafqi5t") or die($link);
     $i = 1;
     foreach($apostas as $aposta){
         if($aposta['tipsterAtivo'] == 'Bloco D'){
             $id = $aposta['matchID'];
             $id2 = json_decode($aposta['dadosAposta'], TRUE)['betId'];
             $partida = $aposta['evento']." - ".$aposta['mercado']." - ".$aposta['aposta'];
-            $partida = mysqli_real_escape_string($link, $partida);
+            $partida = pg_escape_literal($db_handle, $partida);
             $adicionar_query = "INSERT INTO aposta (numero, id, id2, partida) VALUES ('$i', '$id', '$id2', '$partida')";
             $adicionar_dados = pg_query($db_handle, $adicionar_query);
             $i++;
