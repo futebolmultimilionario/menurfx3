@@ -314,7 +314,7 @@ function cadastra_apostas($apostas){
             $id = $aposta['matchID'];
             $id2 = json_decode($aposta['dadosAposta'], TRUE)['betId'];
             $partida = $aposta['evento']." - ".$aposta['mercado']." - ".$aposta['aposta'];
-            $partida = pg_escape_literal($db_handle, $partida);
+            $partida = pg_escape_string($db_handle, $partida);
             $adicionar_query = "INSERT INTO aposta (numero, id, id2, partida) VALUES ('$i', '$id', '$id2', '$partida')";
             $adicionar_dados = pg_query($db_handle, $adicionar_query);
             $i++;
